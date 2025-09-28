@@ -23,21 +23,37 @@ export default function LoginPage() {
     };
   }, []);
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
+async function handleLogin(e: React.FormEvent) {
+  e.preventDefault();
+  setError(null);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: username, // if you want email login
-      password: password,
-    });
+  const { data, error } = await supabase
+    .from("users")
+    .select("user_id, username, role_id, password_hash, active")
+    .eq("username", username)
+    .eq("password_hash", password) // ⚠️ plain text match (for now)
+    .eq("active", true)
+    .single();
 
-    if (error) {
-      setError(error.message);
-    } else {
-      // later: fetch role (student/staff/admin)
-      router.push("/dashboard");
-    }
+  if (error || !data) {
+    setError("Invalid login credentials");
+    return;
   }
+
+  console.log("Logged in:", data);
+
+  // redirect based on role
+  if (data.role_id === 1) {
+    router.push("/admin");
+  } else if (data.role_id === 2) {
+    router.push("/staff");
+  } else if (data.role_id === 3) {
+    router.push("/student");
+  } else {
+    router.push("/dashboard"); // fallback
+  }
+}
+
 
   return (
     <main>

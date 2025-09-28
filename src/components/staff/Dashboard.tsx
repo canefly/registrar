@@ -1,4 +1,4 @@
-import styles from "@/styles/StaffDashboard.module.css";
+import styles from "@/app/styles/StaffDashboard.module.css";
 
 export default function StaffDashboard({ collapsed }: { collapsed: boolean }) {
   return (

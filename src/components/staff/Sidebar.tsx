@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import styles from "@/styles/Sidebar.module.css";
+import styles from "@/app/styles/Sidebar.module.css";
 
 export default function StaffSidebar({
   collapsed,

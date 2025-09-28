@@ -1,28 +1,43 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabaseClient";
 import "./styles/LoginPage.css";
 
 export default function LoginPage() {
   const [showSplash, setShowSplash] = useState(true);
   const [fadeOut, setFadeOut] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  const router = useRouter();
 
   useEffect(() => {
-    // start fade after 2s
-    const fadeTimer = setTimeout(() => {
-      setFadeOut(true);
-    }, 2000);
-
-    // remove splash from DOM after fade finishes (0.8s later)
-    const removeTimer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2800);
-
+    const fadeTimer = setTimeout(() => setFadeOut(true), 2000);
+    const removeTimer = setTimeout(() => setShowSplash(false), 2800);
     return () => {
       clearTimeout(fadeTimer);
       clearTimeout(removeTimer);
     };
   }, []);
+
+  async function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: username, // if you want email login
+      password: password,
+    });
+
+    if (error) {
+      setError(error.message);
+    } else {
+      // later: fetch role (student/staff/admin)
+      router.push("/dashboard");
+    }
+  }
 
   return (
     <main>
@@ -35,13 +50,14 @@ export default function LoginPage() {
         <div id="login-container">
           <h2>Registrar</h2>
 
-          <form method="POST" action="">
+          <form onSubmit={handleLogin}>
             <label htmlFor="username">Username</label>
             <input
               type="text"
               id="username"
-              name="username"
-              placeholder="Enter your username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your email"
               required
             />
 
@@ -49,10 +65,13 @@ export default function LoginPage() {
             <input
               type="password"
               id="password"
-              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
             />
+
+            {error && <p style={{ color: "red" }}>{error}</p>}
 
             <a href="#" className="forgot">
               Forgot Password?

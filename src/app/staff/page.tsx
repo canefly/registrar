@@ -7,7 +7,7 @@ export default function DashboardPage() {
   const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <main className="flex min-h-screen bg-slate-100">
+    <main>
       <StaffSidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <StaffDashboard collapsed={collapsed} />
     </main>
